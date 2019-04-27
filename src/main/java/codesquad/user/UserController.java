@@ -39,8 +39,6 @@ public class UserController {
     }
 
 
-//이거 step1이라 디비 안쓰여
-
     @GetMapping("/{id}/form")
     public String modifyForm(@PathVariable long id, Model model) {
         model.addAttribute("modifyUser", UserRepository
@@ -54,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public String modifyUser(@PathVariable long id, Model model,User user) {
+    public String modifyUser(@PathVariable long id,User user) {
         UserRepository.
                 getInstance()
                 .getUsers()
@@ -64,6 +62,35 @@ public class UserController {
                 .orElse(null)
                 .modify(user);
 
+        return "redirect:/users";
+    }
+
+    @GetMapping("/{id}/passCheck")
+    public String checkPassForm(@PathVariable long id, Model model) {       // user리스트에서 내가 만약 다른 사람의 수정버튼을 누르면
+        User targetUser = UserRepository.getInstance()                      // 다른사람의 정보를 가져와서 비밀번호 창까지 정보를 가져온다.
+                .getUsers()
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst()
+                .orElse(null);
+
+        model.addAttribute("users",targetUser);
+        return "/user/checkPassword";
+    }
+
+    @PostMapping("/{id}/checkUser")
+    public String checkUser(@PathVariable long id, String password, Model model) {       // 가져온 사람의 정보와 내가 입력한 비밀번호를 비교한다!!
+        User targetUser = UserRepository.getInstance()
+                .getUsers()
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst()
+                .orElse(null);
+
+        if (targetUser.isMine(password)) {
+            model.addAttribute("modifyUser",targetUser);
+            return "/user/updateForm";
+        }
         return "redirect:/users";
     }
 }

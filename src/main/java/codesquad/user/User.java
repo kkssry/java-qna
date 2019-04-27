@@ -57,6 +57,10 @@ public class User {
         email = user.email;
     }
 
+    public boolean isMine(String password) {
+        return this.password.equals(password);
+    }
+
     @Override
     public String toString() {
         return "User{" +
