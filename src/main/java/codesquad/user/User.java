@@ -1,11 +1,29 @@
 package codesquad.user;
 
+import codesquad.question.Answer;
+import codesquad.question.Question;
+
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
+
+    @Column(nullable=false, length = 20)
     String userId;
+
     String password;
     String name;
     String email;
+
+    @OneToMany(mappedBy = "user")
+    private List<Question> questions;
+
+    @OneToMany(mappedBy = "user")
+    private List<Answer> answers;
 
     public long getId() {
         return id;
@@ -51,19 +69,29 @@ public class User {
         this.id = id;
     }
 
-    public void modify(User user) {
+    public User modify(User user) {
         password = user.password;
         name = user.name;
         email = user.email;
+        return this;
     }
 
-    public boolean isMine(String password) {
+    public boolean isSamePassword(String password) {
         return this.password.equals(password);
+    }
+
+    public boolean isSameUserId(long id) {
+        return this.id == id;
+    }
+
+    public boolean isMine(User user) {
+        return isSameUserId(user.id) && isSamePassword(user.password);
     }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "!!!!!!!!!!!!!!!!!!" +
+                "User{" +
                 "userId='" + userId + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
